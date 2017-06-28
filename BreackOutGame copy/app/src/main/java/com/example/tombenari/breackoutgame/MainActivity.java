@@ -32,6 +32,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         if (v==wallOfFameBtn){
             //TODO bild wall of fame activity
+            Intent intent = new Intent(this, WallOfFameActivity.class);
+            startActivity(intent);
         }
     }
 }

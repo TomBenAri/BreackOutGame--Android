@@ -2,6 +2,7 @@ package com.example.tombenari.breackoutgame;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.graphics.Canvas;
@@ -11,6 +12,7 @@ import android.graphics.Point;
 import android.graphics.RectF;
 import android.media.AudioManager;
 import android.media.SoundPool;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,7 +25,11 @@ import java.io.IOException;
 
 public class GameActivity extends Activity {
 
+    public static final String SCORE = "score";
     BreakoutView breakoutView;
+    Context context1 = this;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +42,7 @@ public class GameActivity extends Activity {
     class BreakoutView extends SurfaceView implements Runnable {
 
         Thread gameThread = null;
+        private Handler handler;
 
         SurfaceHolder ourHolder;
 
@@ -81,16 +88,12 @@ public class GameActivity extends Activity {
             ball = new Ball(screenX, screenY);
 
             // Load the sounds
-
-// This SoundPool is deprecated but don't worry
             soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC,0);
 
             try{
-                // Create objects of the 2 required classes
                 AssetManager assetManager = context.getAssets();
                 AssetFileDescriptor descriptor;
 
-                // Load our fx in memory ready for use
                 descriptor = assetManager.openFd("beep1.ogg");
                 beep1ID = soundPool.load(descriptor, 0);
 
@@ -107,7 +110,6 @@ public class GameActivity extends Activity {
                 explodeID = soundPool.load(descriptor, 0);
 
             }catch(IOException e){
-                // Print an error message to the console
                 Log.e("error", "failed to load sound files");
             }
 
@@ -116,6 +118,7 @@ public class GameActivity extends Activity {
         }
 
         public void createBricksAndRestart(){
+
             // Put the ball back to the start
             ball.reset(screenX, screenY);
             int brickWidth = screenX / 8;
@@ -128,6 +131,8 @@ public class GameActivity extends Activity {
                     numBricks ++;
                 }
             }
+
+
             // Reset scores and lives
             score = 0;
             lives = 3;
@@ -140,11 +145,24 @@ public class GameActivity extends Activity {
                 long startFrameTime = System.currentTimeMillis();
 
                 if (!paused){
-                    update();
+                  update();
                 }
+                if (paused==true && lives==0 || paused == true && score == numBricks * 10 )  {
+                    playing = false;
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent intent = new Intent(context1, NameActivity.class);
+                            intent.putExtra(SCORE, score);
+                            startActivity(intent);
+                            finish();
+                        }
+                    });
 
-                draw();
-
+                }
+                if (lives > 0) {
+                    draw();
+                }
                 timeThisFrame = System.currentTimeMillis() - startFrameTime;
                 if (timeThisFrame >= 1){
                     fps = 1000/ timeThisFrame;
@@ -186,8 +204,8 @@ public class GameActivity extends Activity {
                 soundPool.play(loseLifeID, 1, 1, 0, 0, 1);
 
                 if(lives == 0){
-                    paused = true;
-                    createBricksAndRestart();
+                   paused = true;
+
                 }
 
             }
@@ -210,7 +228,7 @@ public class GameActivity extends Activity {
             // Pause if cleared screen
             if(score == numBricks * 10){
                 paused = true;
-                createBricksAndRestart();
+                //createBricksAndRestart();
             }
         }
 
@@ -218,13 +236,13 @@ public class GameActivity extends Activity {
 
             if (ourHolder.getSurface().isValid()){
                 canvas = ourHolder.lockCanvas();
-                canvas.drawColor(Color.argb(255, 26, 128, 182));
+                canvas.drawColor(Color.argb(255, 26, 12, 100));
                 paint.setColor(Color.argb(255,255,255,255));
                 canvas.drawRect(paddle.getRect(),paint);
                 canvas.drawRect(ball.getRect(),paint);
 
                 // Change the brush color for drawing
-                paint.setColor(Color.argb(255,  249, 129, 0));
+                paint.setColor(Color.argb(255,  249, 20, 12));
                 for (int i = 0; i < numBricks; i++) {
                     if (bricks[i].getVisibility()){
                         canvas.drawRect(bricks[i].getRect(),paint);
@@ -263,6 +281,7 @@ public class GameActivity extends Activity {
         public void resume () {
             playing = true;
             gameThread = new Thread(this);
+            handler = new Handler();
             gameThread.start();
         }
 

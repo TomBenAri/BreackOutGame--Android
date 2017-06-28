@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_wall_of_fame"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimaryDark"
+    tools:context="com.example.tombenari.breackoutgame.WallOfFameActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Name:"
+            android:layout_marginRight="60dp"
+            android:textSize="30sp"
+            android:layout_marginLeft="20dp"
+            android:textColor="#999999"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Score:"
+            android:layout_marginRight="30dp"
+            android:textSize="30sp"
+            android:textColor="#999999"
+            android:textStyle="bold"/>
+
+
+    </LinearLayout>
+
+    <ListView
+        android:layout_marginTop="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/list"></ListView>
+</LinearLayout>
